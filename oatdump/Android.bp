@@ -35,6 +35,7 @@ art_cc_binary {
     shared_libs: [
         "libart",
         "libart-compiler",
+        "libart-dexlayout",
         "libart-disassembler",
         "libdexfile",
         "libbase",
@@ -50,6 +51,7 @@ art_cc_binary {
     shared_libs: [
         "libartd",
         "libartd-compiler",
+        "libartd-dexlayout",
         "libartd-disassembler",
         "libdexfiled",
         "libbase",
@@ -78,6 +80,7 @@ art_cc_binary {
         "libart",
         "libdexfile",
         "libart-compiler",
+        "libart-dexlayout",
         "libart-disassembler",
         "libvixl-arm",
         "libvixl-arm64",
@@ -109,6 +112,7 @@ art_cc_binary {
         "libartd",
         "libdexfiled",
         "libartd-compiler",
+        "libartd-dexlayout",
         "libartd-disassembler",
         "libvixld-arm",
         "libvixld-arm64",
