@@ -44,13 +44,17 @@
 #include "debug/debug_info.h"
 #include "debug/elf_debug_writer.h"
 #include "debug/method_debug_info.h"
+#ifdef CDEX_CONVERTER
 #include "dex/art_dex_file_loader.h"
+#endif
 #include "dex/code_item_accessors-inl.h"
 #include "dex/descriptors_names.h"
 #include "dex/dex_file-inl.h"
 #include "dex/dex_instruction-inl.h"
 #include "dex/string_reference.h"
+#ifdef CDEX_CONVERTER
 #include "dexlayout.h"
+#endif
 #include "disassembler.h"
 #include "gc/accounting/space_bitmap-inl.h"
 #include "gc/space/image_space.h"
@@ -628,7 +632,10 @@ class OatDumper {
         const OatFile::OatDexFile* oat_dex_file = oat_dex_files_[i];
         CHECK(oat_dex_file != nullptr);
         CHECK(vdex_dex_file != nullptr);
-
+#ifndef CDEX_CONVERTER
+        if (!ExportDexFile(os, *oat_dex_file, vdex_dex_file.get())) {
+          success = false;
+#else
         // If a CompactDex file is detected within a Vdex container, DexLayout is used to convert
         // back to a StandardDex file. Since the converted DexFile will most likely not reproduce
         // original input Dex file, ExportDexFile should know if DexLayout was used to adjust the
@@ -682,6 +689,7 @@ class OatDumper {
             success = false;
             break;
           }
+#endif
         }
         i++;
       }
@@ -1189,11 +1197,19 @@ class OatDumper {
   // a CompactDex file via dexlayout and requires to recompute checksum.
   bool ExportDexFile(std::ostream& os,
                      const OatFile::OatDexFile& oat_dex_file,
+#ifndef CDEX_CONVERTER
+                     const DexFile* dex_file) {
+#else
                      const DexFile* dex_file,
                      bool used_dexlayout) {
+#endif
     std::string error_msg;
     std::string dex_file_location = oat_dex_file.GetDexFileLocation();
+#ifndef CDEX_CONVERTER
+    size_t fsize = oat_dex_file.FileSize();
+#else
     size_t fsize = dex_file == nullptr ? oat_dex_file.FileSize() : dex_file->Size();
+#endif
 
     // Some quick checks just in case
     if (fsize == 0 || fsize < sizeof(DexFile::Header)) {
@@ -1213,6 +1229,15 @@ class OatDumper {
       reinterpret_cast<DexFile::Header*>(const_cast<uint8_t*>(dex_file->Begin()))->checksum_ =
           dex_file->CalculateChecksum();
     } else {
+#ifndef CDEX_CONVERTER
+      // Vdex unquicken output should match original input bytecode
+      uint32_t orig_checksum =
+          reinterpret_cast<DexFile::Header*>(const_cast<uint8_t*>(dex_file->Begin()))->checksum_;
+      CHECK_EQ(orig_checksum, dex_file->CalculateChecksum());
+      if (orig_checksum != dex_file->CalculateChecksum()) {
+        os << "Unexpected checksum from unquicken dex file '" << dex_file_location << "'\n";
+        return false;
+#else
       // When dexlayout is used to convert CompactDex back to StandardDex, checksum is not
       // reproducible
       if (used_dexlayout) {
@@ -1226,8 +1251,23 @@ class OatDumper {
           os << "Unexpected checksum from unquicken dex file '" << dex_file_location << "'\n";
           return false;
         }
+#endif
       }
     }
+
+#ifndef CDEX_CONVERTER
+   // Update header for shared section.
+    uint32_t shared_section_offset = 0u;
+    uint32_t shared_section_size = 0u;
+    if (dex_file->IsCompactDexFile()) {
+      CompactDexFile::Header* const header =
+          reinterpret_cast<CompactDexFile::Header*>(const_cast<uint8_t*>(dex_file->Begin()));
+      shared_section_offset = header->data_off_;
+      shared_section_size = header->data_size_;
+      // The shared section will be serialized right after the dex file.
+      header->data_off_ = header->file_size_;
+    }
+#endif
 
     // Verify output directory exists
     if (!OS::DirectoryExists(options_.export_dex_location_)) {
@@ -1281,6 +1321,17 @@ class OatDumper {
       file->Erase();
       return false;
     }
+
+#ifndef CDEX_CONVERTER
+    if (shared_section_size != 0) {
+      success = file->WriteFully(dex_file->Begin() + shared_section_offset, shared_section_size);
+      if (!success) {
+        os << "Failed to write shared data section";
+        file->Erase();
+        return false;
+      }
+    }
+#endif
 
     if (file->FlushCloseOrErase() != 0) {
       os << "Flush and close failed";
