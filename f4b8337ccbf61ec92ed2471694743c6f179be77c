@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "80a6f82e_61a4971a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 384
+      },
+      "writtenOn": "2023-05-07T12:20:35Z",
+      "side": 1,
+      "message": "Hack to workaround mmap issues on 6.1+\n\nFrom: https://review.tequilaos.pl/c/tequilaOS/platform_art/+/551",
+      "revId": "f4b8337ccbf61ec92ed2471694743c6f179be77c",
+      "serverId": "66da7299-18b4-411a-8fa2-12a880778196"
+    }
+  ]
+}
