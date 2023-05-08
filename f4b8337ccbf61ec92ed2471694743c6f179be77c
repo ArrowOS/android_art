@@ -51,6 +51,24 @@
       "message": "It\u0027s still needed with debian 6.1.0-0.deb11.6-amd64 kernel. I\u0027ll check when updated kernel lands",
       "revId": "f4b8337ccbf61ec92ed2471694743c6f179be77c",
       "serverId": "66da7299-18b4-411a-8fa2-12a880778196"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "403deb20_38fc79aa",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 384
+      },
+      "writtenOn": "2023-05-08T19:46:23Z",
+      "side": 1,
+      "message": "More precisely : i\u0027m currently using Debian 6.1.15-1~bpo11+1\n\nIinm problem is fixed by \"mm/mmap: regression fix for unmapped_area{_topdown}\" in 6.1.27, 6.2.13, 6.3",
+      "parentUuid": "4ca3f62e_ffb81e77",
+      "revId": "f4b8337ccbf61ec92ed2471694743c6f179be77c",
+      "serverId": "66da7299-18b4-411a-8fa2-12a880778196"
     }
   ]
 }
