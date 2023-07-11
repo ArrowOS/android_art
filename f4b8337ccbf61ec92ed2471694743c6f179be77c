@@ -87,6 +87,23 @@
       "parentUuid": "403deb20_38fc79aa",
       "revId": "f4b8337ccbf61ec92ed2471694743c6f179be77c",
       "serverId": "66da7299-18b4-411a-8fa2-12a880778196"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a36ee938_e58afa9c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 384
+      },
+      "writtenOn": "2023-07-11T17:20:41Z",
+      "side": 1,
+      "message": "Seems to be fixed in latest debian kernel (6.1.37)",
+      "revId": "f4b8337ccbf61ec92ed2471694743c6f179be77c",
+      "serverId": "66da7299-18b4-411a-8fa2-12a880778196"
     }
   ]
 }
